@@ -1,3 +1,4 @@
+import random
 
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
@@ -13,7 +14,7 @@ class RBFArena():
     also supports lidar sensor simulation.
     '''
     def __init__(self, N_points=15, obs_low=-0.7, obs_high=0.7, rbf_gamma=25, threshold=0.9, 
-                 grid_res=150, grid_bd=1.2):
+                 grid_res=150, grid_bd=1.2, seed=1337):
         self.N_points  = N_points
         self.obs_low   = obs_low
         self.obs_high  = obs_high
@@ -21,11 +22,19 @@ class RBFArena():
         self.threshold = threshold
         self.grid_res   = grid_res
         self.grid_bd = grid_bd
+        self.seed = seed
         self.reset()
 
     def reset(self, obs_override=None):
+        random.seed(self.seed)
         if obs_override is None:
-            self.points = np.random.uniform(low=self.obs_low, high=self.obs_high, size=(self.N_points, 2))
+            self.points = [
+                np.array([
+                    random.uniform(self.obs_low, self.obs_high),
+                    random.uniform(self.obs_low, self.obs_high)
+                ])
+                for _ in range(self.N_points)
+            ]
         else:
             self.points = np.array(obs_override)
         self.occ_grid = None
