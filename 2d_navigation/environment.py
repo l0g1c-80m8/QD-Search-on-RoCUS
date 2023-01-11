@@ -1,5 +1,4 @@
 import random
-
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 from sklearn.metrics.pairwise import rbf_kernel

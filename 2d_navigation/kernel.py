@@ -1,4 +1,4 @@
-
+import random
 import numpy as np
 from scipy.stats import norm, truncnorm
 
@@ -50,11 +50,12 @@ def truncnorm_logpdf(x, a, b, mean, std):
 	return truncnorm.logpdf(x, a_use, b_use, mean, std)
 
 class RBF2dEnvKernelNormal(TransitionKernel):
-	def __init__(self, sigma=0.1, N_points=15, obs_low=-0.7, obs_high=0.7):
+	def __init__(self, sigma=0.1, N_points=15, obs_low=-0.7, obs_high=0.7, seed = 1337):
 		self.sigma = sigma
 		self.N_points = N_points
 		self.obs_low = obs_low
 		self.obs_high = obs_high
+		self.seed = seed
 		super(RBF2dEnvKernelNormal, self).__init__()
 	def propose(self):
 		self.prev_value = self.value
@@ -70,7 +71,14 @@ class RBF2dEnvKernelNormal(TransitionKernel):
 															mean=self.value[i, j], std=self.sigma)
 		return total_forward_log_prob, total_backward_log_prob
 	def sample_prior(self):
-		self.value = np.random.uniform(low=self.obs_low, high=self.obs_high, size=(self.N_points, 2))
+		random.seed(self.seed)
+		self.value = [
+			np.array([
+				random.uniform(self.obs_low, self.obs_high),
+				random.uniform(self.obs_low, self.obs_high)
+			])
+			for _ in range(self.N_points)
+		]
 		self.prev_value = None
 
 class RRTKernelNormal(TransitionKernel):
